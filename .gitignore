@@ -1,7 +1,3 @@
-state/
-manifests/
-pairs/
-states_subset/
-runs.log
-results/
+state/refs.npz
 __pycache__/
+results/
