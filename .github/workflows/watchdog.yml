@@ -1,0 +1,20 @@
+name: watchdog
+on:
+  schedule:
+    - cron: "50 5 * * *"    # daily 05:50 UTC (after the 01/07/13/19:23 fetches)
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: fail if archive is stale
+        run: |
+          LAST=$(git log -1 --format=%cI -- manifests/ 2>/dev/null || echo never)
+          NOW=$(date -u +%s)
+          AGE=$(( NOW - $(date -d "${LAST:-2000-01-01}" +%s) ))
+          echo "last manifest commit: ${LAST}, age ${AGE}s"
+          test "$AGE" -lt 108000   # 30 h: four fetch slots missed = unhealthy
