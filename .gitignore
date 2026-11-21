@@ -1,0 +1,7 @@
+state/
+manifests/
+pairs/
+states_subset/
+runs.log
+results/
+__pycache__/

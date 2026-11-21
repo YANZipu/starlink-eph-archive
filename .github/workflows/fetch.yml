@@ -1,0 +1,39 @@
+name: fetch-vintage
+on:
+  schedule:
+    - cron: "23 1,7,13,19 * * *"   # 4x/day (vintage rotates ~8 h); UTC
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: fetch
+  cancel-in-progress: false
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install numpy
+      - name: restore rolling state
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh release view latest --json assets -q '.assets[].name' 2>/dev/null | grep -q refs.npz \
+            && gh release download latest -p refs.npz -O state_refs.npz --clobber || echo "no prior state"
+          [ -f state_refs.npz ] && mkdir -p state && mv state_refs.npz state/refs.npz || true
+      - run: python scripts/fetch_process.py
+      - name: commit artifacts
+        run: |
+          git config user.name "archive-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add manifests pairs states_subset state/last_manifest.txt runs.log
+          git diff --cached --quiet || (git commit -m "vintage $(date -u +%Y%m%dT%H%MZ)" && git push)
+          git push || true
+      - name: publish rolling state
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh release create latest --prerelease --title "rolling state" \
+            --notes "auto-managed refs.npz; overwritten every run" 2>/dev/null || true
+          gh release upload latest state/refs.npz --clobber

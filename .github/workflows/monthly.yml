@@ -1,0 +1,26 @@
+name: monthly-bundle
+on:
+  schedule:
+    - cron: "33 2 1 * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: bundle previous month states_subset
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          M=$(date -u -d "3 days ago" +%Y%m)
+          if ls states_subset/$M >/dev/null 2>&1; then
+            tar -C states_subset -czf states_subset_$M.tar.gz $M
+            gh release create v$M --title "states $M" --notes "detailed subset states, $M" \
+              "states_subset_$M.tar.gz" || \
+              gh release upload v$M states_subset_$M.tar.gz --clobber
+            echo "bundled $M"
+          else
+            echo "no data for $M"
+          fi
