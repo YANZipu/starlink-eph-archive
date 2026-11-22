@@ -1,1 +1,2 @@
 {"run": "20261121T081746Z", "manifest_files": 11206, "sats_total": 25, "sats_subset": 25, "do_pairs": false, "parse_seconds": 9.5, "parsed": 25, "failed": 0, "subset_saved": 25, "sizes_mb": {"manifests": 0.1, "pairs": 0.0, "states_subset": 0.6, "state": 0.9}}
+{"run": "20261121T235801Z", "manifest_files": 11200, "sats_total": 11200, "sats_subset": 200, "do_pairs": false, "parse_seconds": 4294.0, "parsed": 11200, "failed": 0, "subset_saved": 200, "sizes_mb": {"manifests": 0.1, "pairs": 0.0, "states_subset": 5.8, "state": 13.4}}
