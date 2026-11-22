@@ -53,10 +53,10 @@ def parse_meme(text):
 
 def hermite_pos(t, rv, tq):
     j = np.clip(np.searchsorted(t, tq) - 1, 0, len(t) - 2)
-    h = t[j + 1] - t[j]; s = (tq - t[j]) / h
+    h = t[j + 1] - t[j]; s = ((tq - t[j]) / h)[:, None]      # (n,1) broadcasts with (n,3)
     p0, v0, p1, v1 = rv[j, :3], rv[j, 3:], rv[j + 1, :3], rv[j + 1, 3:]
-    return ((2*s**3 - 3*s**2 + 1) * p0 + (s**3 - 2*s**2 + s) * h * v0
-            + (-2*s**3 + 3*s**2) * p1 + (s**3 - s**2) * h * v1)
+    return ((2*s**3 - 3*s**2 + 1) * p0 + (s**3 - 2*s**2 + s) * (h[:, None] * v0)
+            + (-2*s**3 + 3*s**2) * p1 + (s**3 - s**2) * (h[:, None] * v1))
 
 def main():
     ts = now_utc().strftime("%Y%m%dT%H%M%SZ")
@@ -108,9 +108,10 @@ def main():
             tq = tq[m]
             if len(tq):
                 p2 = hermite_pos(t, rv, tq)
-                dr_m = np.linalg.norm(p2 - prv[ok][m][:, :3], axis=1) * 1e3
+                dr_km = p2 - prv[ok][m][:, :3]
+                dr_m = np.linalg.norm(dr_km, axis=1) * 1e3
                 P_m = pcov[ok][m][:, :3, :3] * 1e6
-                chi2 = np.einsum("ni,nij,nj->n", dr_m, np.linalg.inv(P_m), dr_m)
+                chi2 = np.einsum("ni,nij,nj->n", dr_km, np.linalg.inv(P_m), dr_km) * 1e6
                 age = tq - pt0
                 b = []
                 for lo, hi in zip(BUCKET_EDGES_H[:-1], BUCKET_EDGES_H[1:]):
