@@ -3,7 +3,7 @@
 # Source: https://api.starlink.com/public-files/ephemerides/ (public, no auth).
 # Raw files (~2 MB each, ~7000 sats ~= 14 GB per vintage) are processed in flight and
 # discarded; only compact derived products are kept (see README).
-import gzip, json, os, re, time, urllib.request, datetime
+import gzip, json, os, re, sys, time, urllib.request, datetime
 from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 
@@ -86,6 +86,21 @@ def main():
     else:
         prev, prev_index, do_pairs = None, {}, False
     rep["do_pairs"] = do_pairs
+    lc = f"{ROOT}/state/last_check.txt"
+    age_h = 99.0
+    if os.path.exists(lc):
+        try:
+            age_h = (time.time() - float(open(lc).read().strip())) / 3600.0
+        except ValueError:
+            pass
+    open(lc, "w").write(str(time.time()))
+    if prev is not None and not do_pairs and age_h < 5.0:
+        rep["early_exit"] = "vintage unchanged, checked %.1f h ago" % age_h
+        with open(f"{ROOT}/runs.log", "a") as f:
+            f.write(json.dumps(rep) + "
+")
+        print(json.dumps(rep, indent=1))
+        sys.exit(0)
 
     def handle(sat):
         txt = get(BASE + sat2file[sat]).decode()
