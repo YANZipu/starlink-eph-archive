@@ -97,8 +97,7 @@ def main():
     if prev is not None and not do_pairs and age_h < 5.0:
         rep["early_exit"] = "vintage unchanged, checked %.1f h ago" % age_h
         with open(f"{ROOT}/runs.log", "a") as f:
-            f.write(json.dumps(rep) + "
-")
+            f.write(json.dumps(rep) + chr(10))
         print(json.dumps(rep, indent=1))
         sys.exit(0)
 
