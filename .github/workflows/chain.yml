@@ -1,0 +1,20 @@
+name: chain
+on:
+  workflow_run:
+    workflows: ["fetch-vintage"]
+    types: [completed]
+permissions:
+  actions: write
+jobs:
+  trigger-next:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: trigger next fetch (fires on success AND failure)
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          # Only trigger if the completed run wasn't itself a duplicate chain
+          CONCLUSION=${{ github.event.workflow_run.conclusion }}
+          RUN_ID=${{ github.event.workflow_run.id }}
+          echo "Previous fetch run $RUN_ID concluded: $CONCLUSION — chaining next"
+          gh workflow run fetch.yml --ref main

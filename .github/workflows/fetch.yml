@@ -5,7 +5,6 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
-  actions: write
 concurrency:
   group: fetch
   cancel-in-progress: false
@@ -41,6 +40,3 @@ jobs:
           gh release create latest --prerelease --title "rolling state" \
             --notes "auto-managed refs.npz; overwritten every run" 2>/dev/null || true
           gh release upload latest state/refs.npz --clobber
-      - name: self-chain next run (scheduler-independent cadence)
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: gh workflow run fetch.yml --ref main
