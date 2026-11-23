@@ -17,4 +17,4 @@ jobs:
           CONCLUSION=${{ github.event.workflow_run.conclusion }}
           RUN_ID=${{ github.event.workflow_run.id }}
           echo "Previous fetch run $RUN_ID concluded: $CONCLUSION — chaining next"
-          gh workflow run fetch.yml --ref main
+          gh workflow run fetch.yml --repo YANZipu/starlink-eph-archive --ref main
