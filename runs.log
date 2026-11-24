@@ -10,3 +10,4 @@
 {"run": "20261123T204018Z", "manifest_files": 11198, "sats_total": 11198, "sats_subset": 204, "do_pairs": false, "early_exit": "vintage unchanged, checked 0.0 h ago"}
 {"run": "20261123T204409Z", "manifest_files": 11198, "sats_total": 11198, "sats_subset": 204, "do_pairs": false, "early_exit": "vintage unchanged, checked 0.1 h ago"}
 {"run": "20261123T204439Z", "manifest_files": 11198, "sats_total": 11198, "sats_subset": 204, "do_pairs": false, "early_exit": "vintage unchanged, checked 0.0 h ago"}
+{"run": "20261124T005952Z", "manifest_files": 11198, "sats_total": 11198, "sats_subset": 204, "do_pairs": true, "parse_seconds": 5516.8, "parsed": 11198, "failed": 0, "subset_saved": 204, "pair_sats": 11198, "med_dr_nonmaneuver_m": 202.3, "maneuver_like": 730, "dr_p50_p90_p99_m": [219.8, 716.7, 9164.3], "sizes_mb": {"manifests": 0.9, "pairs": 2.4, "states_subset": 41.5, "state": 13.4}}
